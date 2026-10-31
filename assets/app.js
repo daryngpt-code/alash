@@ -404,7 +404,7 @@ function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;',
 /* ============ SURVEY ============ */
 /* Google Forms байланысы: formAction — https://docs.google.com/forms/d/e/<ID>/formResponse,
    entries — әр сұрақтың entry.XXXX атауы (форманың «алдын ала толтырылған сілтемесінен» алынады). */
-const SURVEY_CFG={formAction:'',entries:{}};
+const SURVEY_CFG={formAction:'https://docs.google.com/forms/d/e/1FAIpQLSf9hnHo64nOdP2aUNpnFPYwvHbtCK6TgEkPaxG9tq9mnMSQyA/formResponse',entries:{'q1': 'entry.918111228', 'q2': 'entry.984913752', 'q3': 'entry.495080132', 'q4': 'entry.747402756', 'q5': 'entry.1176975060', 'q6': 'entry.1939644069', 'q7': 'entry.1451882490', 'q8': 'entry.407790301', 'q9': 'entry.345264352', 'q10': 'entry.1370244965'}};
 const SURVEY=[
  {id:'q1',type:'closed',t:'Жасыңыз қаншада?',o:['14–17 жас','18–22 жас','23–35 жас','36 жастан жоғары']},
  {id:'q2',type:'closed',t:'Алаш қозғалысы туралы бұрын естідіңіз бе?',o:['Иә, жақсы білемін','Аздап естідім','Жоқ, естімедім']},
