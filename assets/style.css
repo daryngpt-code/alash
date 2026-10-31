@@ -90,7 +90,7 @@ figure.illus svg{display:block;width:100%;height:auto}
 figure.illus figcaption{font-size:13px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--line)}
 
 /* map */
-.map-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start;margin-top:16px}
+.map-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-top:16px}
 @media (max-width:900px){.map-layout{grid-template-columns:1fr}}
 .map-intro{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
 @media (max-width:900px){.map-intro{grid-template-columns:1fr}}
@@ -133,8 +133,6 @@ figure.illus figcaption{font-size:13px;color:var(--muted);padding:10px 14px;bord
 .tog i{width:10px;height:10px;border-radius:50%;display:inline-block}
 .info{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:12px}
 .info h3{font-size:1.5rem;color:var(--gold)}
-.info{position:sticky;top:76px}
-@media (max-width:900px){.info{position:static}}
 .info dl{margin:0;display:grid;gap:10px}
 .info dt{font:12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .info dd{margin:0}
