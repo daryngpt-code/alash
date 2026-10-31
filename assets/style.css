@@ -90,8 +90,22 @@ figure.illus svg{display:block;width:100%;height:auto}
 figure.illus figcaption{font-size:13px;color:var(--muted);padding:10px 14px;border-top:1px solid var(--line)}
 
 /* map */
-.map-layout{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:20px;align-items:start}
+.map-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start;margin-top:16px}
 @media (max-width:900px){.map-layout{grid-template-columns:1fr}}
+.map-intro{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px}
+@media (max-width:900px){.map-intro{grid-template-columns:1fr}}
+.mi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:grid;gap:8px;align-content:start}
+.mi h3{font-size:1.2rem;color:var(--gold)}
+.mi p,.mi li{font-size:15px;color:#d9d2c0}
+.mi ol,.mi ul{margin:0;padding-left:20px;display:grid;gap:4px}
+.talk{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:18px 20px;display:grid;gap:12px}
+.talk h3{font-size:1.4rem}
+.talk ol{list-style:none;margin:0;padding:0;display:grid;gap:10px;counter-reset:t}
+.talk li{display:grid;grid-template-columns:34px 1fr;gap:12px;counter-increment:t;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px}
+.talk li::before{content:counter(t);font:800 1.4rem/1.2 var(--display);color:var(--gold2);text-align:center}
+.talk li b{display:block;color:var(--ink);margin-bottom:2px}
+.talk li span{font-size:15px;color:#d9d2c0}
+.talk .legend-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:1px}
 .map-box{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:10px;position:relative}
 .map-box svg{display:block;width:100%;height:auto;touch-action:manipulation}
 .obl{fill:var(--paper2);stroke:rgba(212,162,76,.75);stroke-width:1;stroke-linejoin:round;cursor:pointer;transition:fill .2s}
@@ -100,23 +114,27 @@ figure.illus figcaption{font-size:13px;color:var(--muted);padding:10px 14px;bord
 .obl.right{fill:rgba(127,214,160,.35)}
 .obl.wrong{fill:rgba(255,143,128,.35)}
 .outline{fill:none;stroke:var(--gold);stroke-width:2;stroke-linejoin:round;pointer-events:none}
-.obl-label.sm{font-size:11.5px}
-.water-label.big{font-size:14px}
-.obl-label{font:700 14px var(--display);fill:var(--ink);pointer-events:none;text-anchor:middle}
+.obl-label.sm{font-size:16px}
+.water-label.big{font-size:19px}
+.obl-label{font:700 22px var(--display);paint-order:stroke;stroke:rgba(6,32,43,.75);stroke-width:4px;stroke-linejoin:round;fill:var(--ink);pointer-events:none;text-anchor:middle}
 .water{fill:#0c3a52;stroke:#2a6a85;stroke-width:1}
-.water-label{font:italic 11px var(--body);fill:#7fb3c8;text-anchor:middle;pointer-events:none}
+.water-label{font:italic 15px var(--body);fill:#7fb3c8;text-anchor:middle;pointer-events:none}
 .rail{fill:none;stroke:var(--gold);stroke-width:2.5;stroke-dasharray:8 5}
 .city circle{fill:var(--ink)}
-.city text{font:13px var(--body);fill:var(--muted)}
+.city text{font:16px var(--body);fill:#c9d6d8;paint-order:stroke;stroke:rgba(6,32,43,.85);stroke-width:3.5px;stroke-linejoin:round}
 .fair circle{fill:var(--gold2);stroke:var(--bg);stroke-width:2}
 .ev circle{fill:var(--bad);stroke:var(--bg);stroke-width:2}
-.ev text,.fair text{font:700 13px var(--body);fill:var(--ink)}
+.ev text,.fair text{font:700 16px var(--body);fill:var(--ink);paint-order:stroke;stroke:rgba(6,32,43,.85);stroke-width:3.5px;stroke-linejoin:round}
+.ev text{fill:#ffc2b8}
+.fair text{fill:var(--gold)}
 .layer-toggles{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
 .tog{border:1px solid var(--line);background:var(--chip);color:var(--muted);padding:7px 13px;border-radius:999px;font-size:14px;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
 .tog[aria-pressed="true"]{border-color:var(--gold2);color:var(--ink)}
 .tog i{width:10px;height:10px;border-radius:50%;display:inline-block}
 .info{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:20px;display:grid;gap:12px}
 .info h3{font-size:1.5rem;color:var(--gold)}
+.info{position:sticky;top:76px}
+@media (max-width:900px){.info{position:static}}
 .info dl{margin:0;display:grid;gap:10px}
 .info dt{font:12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .info dd{margin:0}
@@ -303,7 +321,7 @@ figure.illus figcaption{font-size:13px;color:var(--muted);padding:10px 14px;bord
   .section{padding-bottom:36px}
   .next{padding-block:18px 26px}
   .map-box{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .map-box svg{min-width:640px}
+  .map-box svg{min-width:860px}
   .map-box::after{content:"← картаны сырғытыңыз →";display:block;text-align:center;font:12px var(--mono);color:var(--muted);padding-top:6px;position:sticky;left:0}
   .task{padding:16px}
   .task-tabs{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px;scrollbar-width:none}
