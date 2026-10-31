@@ -1,7 +1,7 @@
 /* ============ DATA ============ */
 const NAV=[
  ['home','Басты бет'],['map','Карта'],['learn','Оқу'],['people','Тұлғалар'],
- ['events','Оқиғалар'],['facts','Деректер'],['game','Ойын'],['terms','Терминдер'],['result','Нәтиже']];
+ ['events','Оқиғалар'],['facts','Деректер'],['game','Ойын'],['survey','Сауалнама'],['terms','Терминдер'],['result','Нәтиже']];
 
 const THESES=[
  {t:'Отарлық басқару қазақтарды саяси құқықтан айырды',b:['1867–1868 жылғы уақытша ережелер мен 1891 жылғы Дала ережесі қазақ жерін мемлекет меншігі деп жариялады. Билік генерал-губернаторлар мен әскери губернаторлардың қолына шоғырланды.','Болыс пен ауыл старшыны сайлауы патша әкімшілігінің бақылауымен өтті, жоғары басқаруға қазақтар жіберілмеді.'],k:'Отарлық басқару — дәуірдің барлық мәселесінің саяси негізі.'},
@@ -233,7 +233,7 @@ VIEWS.home=()=>`
   <p>Сайттағы бөлімдерді ретімен өтіп, соңында «Нәтиже» бетінде өз деңгейіңді көр.</p></div>
  <figure class="illus">${mapSVG({layers:false})}<figcaption>ХХ ғасыр басындағы қазақ облыстары (схема). Толығырақ — «Карта» бөлімінде.</figcaption></figure>
 </section>
-<section class="wrap section"><div class="tiles">${NAV.slice(1).map(([id,l],i)=>`<a class="tile" href="#${id}"><span class="n">${String(i+1).padStart(2,'0')}</span><h3>${l}</h3><p>${{map:'Облыстар, темір жолдар, жәрмеңкелер, оқиға орындары',chrono:'1867–1988 жылдардағы оқиғалар желісі',learn:'Тақырыптың 10 негізгі тезисі',people:'Алаш дәуірінің 10 қайраткері',events:'Себебі, барысы, нәтижесі',facts:'30 нақты тарихи факт',game:'5 түрлі интерактивті тапсырма',terms:'Тарихи терминдер карточкалары',result:'Жалпы баға мен қорытынды'}[id]}</p></a>`).join('')}</div></section>`;
+<section class="wrap section"><div class="tiles">${NAV.slice(1).map(([id,l],i)=>`<a class="tile" href="#${id}"><span class="n">${String(i+1).padStart(2,'0')}</span><h3>${l}</h3><p>${{map:'Облыстар, темір жолдар, жәрмеңкелер, оқиға орындары',chrono:'1867–1988 жылдардағы оқиғалар желісі',learn:'Тақырыптың 10 негізгі тезисі',people:'Алаш дәуірінің 10 қайраткері',events:'Себебі, барысы, нәтижесі',facts:'30 нақты тарихи факт',game:'5 түрлі интерактивті тапсырма',survey:'Пікір сауалнамасы: 10 сұрақ, 3 түрі',terms:'Тарихи терминдер карточкалары',result:'Жалпы баға мен қорытынды'}[id]}</p></a>`).join('')}</div></section>`;
 
 VIEWS.map=()=>`${head('Тарихи карта','Қазақ облыстары ХХ ғасыр басында','Карта ХХ ғасыр басындағы оқиғалардың қай жерде болғанын және қазақ жерінің қалай басқарылғанын көрнекі түрде көрсетеді.')}
 <section class="wrap section">
@@ -398,6 +398,86 @@ function renderTask(){renderTabs();const tb=document.getElementById('taskbox');c
   body.querySelectorAll('.row').forEach(r=>r.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;ans[r.dataset.i]=b.dataset.v==='1';r.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));document.getElementById('chk').disabled=Object.keys(ans).length<TF.length;}));
   document.getElementById('chk').onclick=()=>{let s=0;TF.forEach((t,i)=>{const r=body.querySelector(`[data-i="${i}"]`),ok=ans[i]===t[1];if(ok)s++;r.classList.add(ok?'ok':'no');r.querySelector('.why').hidden=false;});body.querySelectorAll('button').forEach(x=>x.disabled=true);finish('tf',s,[]);};
  }
+}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+/* ============ SURVEY ============ */
+/* Google Forms байланысы: formAction — https://docs.google.com/forms/d/e/<ID>/formResponse,
+   entries — әр сұрақтың entry.XXXX атауы (форманың «алдын ала толтырылған сілтемесінен» алынады). */
+const SURVEY_CFG={formAction:'',entries:{}};
+const SURVEY=[
+ {id:'q1',type:'closed',t:'Жасыңыз қаншада?',o:['14–17 жас','18–22 жас','23–35 жас','36 жастан жоғары']},
+ {id:'q2',type:'closed',t:'Алаш қозғалысы туралы бұрын естідіңіз бе?',o:['Иә, жақсы білемін','Аздап естідім','Жоқ, естімедім']},
+ {id:'q3',type:'multi',t:'Алаш қайраткерлерінің қайсысын білесіз?',o:['Әлихан Бөкейханов','Ахмет Байтұрсынов','Міржақып Дулатов','Мұхаметжан Тынышбаев','Мұстафа Шоқай','Жаһанша Досмұхамедов','Мұхаммеджан Сералин','Ешқайсысын білмеймін'],none:'Ешқайсысын білмеймін'},
+ {id:'q4',type:'closed',t:'ХХ ғасыр басындағы қазақ қоғамының ең басты мәселесі не болды деп ойлайсыз?',o:['Жер мәселесі','Саяси құқықсыздық','Білім мен ағарту','Салық ауыртпалығы']},
+ {id:'q5',type:'multi',t:'Қарқаралы петициясының қай талаптарын ең маңызды деп санайсыз?',o:['Жер алуды тоқтату','Ана тілінде оқыту','Діни бостандық','Мемлекеттік Думаға өкіл сайлау','Цензурасыз газет шығару','Жергілікті өзін-өзі басқару']},
+ {id:'q6',type:'closed',t:'Қазақ депутаттарының I және II Мемлекеттік Думаға қатысуы пайдалы болды ма?',o:['Иә, пайдалы болды','Ішінара пайдалы болды','Жоқ, нәтиже бермеді','Білмеймін']},
+ {id:'q7',type:'multi',t:'Алаш тарихы туралы ақпаратты негізінен қайдан аласыз?',o:['Мектеп, оқулық','Кітаптар','Интернет, әлеуметтік желілер','Деректі фильмдер','Мұражайлар','Отбасы, ата-әже']},
+ {id:'q8',type:'open',t:'Алаш зиялыларының қай идеясы бүгін де өзекті деп ойлайсыз?',ph:'Мысалы: ана тілінде білім алу, жерді қорғау…'},
+ {id:'q9',type:'open',t:'Алаш тарихын жастарға кеңінен таныту үшін не істеу керек?',ph:'Өз ұсынысыңызды жазыңыз'},
+ {id:'q10',type:'open',t:'Осы сайт туралы пікіріңіз (міндетті емес)',ph:'Не ұнады, нені жақсартуға болады?',optional:true}
+];
+const STYPE={closed:'Жабық сұрақ · бір жауап',multi:'Көп нұсқалы · бірнеше жауап',open:'Ашық сұрақ · өз жауабыңыз'};
+const SV={i:0,a:{},sending:false};
+let SVDONE=false;try{SVDONE=localStorage.getItem('alash-survey-done')==='1';}catch(e){}
+VIEWS.survey=()=>`${head('Сауалнама','Алаш тарихы: сіздің пікіріңіз','10 сұрақ, 2–3 минут. Сұрақтардың үш түрі бар: жабық (бір жауап), көп нұсқалы (бірнеше жауап) және ашық (өз жауабыңыз). Сауалнама жасырын.')}
+<section class="wrap section"><div class="sv-wrap" id="sv"></div>
+<div class="sv-types">${Object.entries(STYPE).map(([k,v])=>`<span class="sv-type ${k}">${v}</span>`).join('')}</div></section>`;
+INIT.survey=()=>{SVDONE?svThanks(true):svDraw();};
+function svDraw(){
+  const box=document.getElementById('sv');if(!box)return;
+  if(SV.i>=SURVEY.length){svReview();return;}
+  const q=SURVEY[SV.i],a=SV.a[q.id];
+  let field='';
+  if(q.type==='closed')field=`<div class="sv-opts" role="radiogroup">${q.o.map((o,j)=>`<button type="button" role="radio" aria-checked="${a===o}" class="sv-opt ${a===o?'on':''}" data-v="${esc(o)}"><i class="dot"></i>${esc(o)}</button>`).join('')}</div>`;
+  if(q.type==='multi')field=`<div class="sv-opts">${q.o.map(o=>{const on=Array.isArray(a)&&a.includes(o);return `<button type="button" role="checkbox" aria-checked="${on}" class="sv-opt sq ${on?'on':''}" data-v="${esc(o)}"><i class="dot"></i>${esc(o)}</button>`;}).join('')}</div><p class="muted small">Бірнеше жауап таңдауға болады.</p>`;
+  if(q.type==='open')field=`<textarea id="svText" class="sv-text" rows="4" maxlength="600" placeholder="${esc(q.ph||'')}">${esc(a||'')}</textarea><p class="muted small" id="svCnt">${(a||'').length} / 600</p>`;
+  box.innerHTML=`<div class="sv-progress"><span>${SV.i+1} / ${SURVEY.length}</span><div class="bar" style="max-width:none"><i style="width:${(SV.i)/SURVEY.length*100}%"></i></div></div>
+  <div class="sv-card"><span class="sv-type ${q.type}">${STYPE[q.type]}</span><h2>${SV.i+1}. ${esc(q.t)}</h2>${field}<p class="login-err" id="svErr" role="alert"></p>
+  <div class="sv-nav"><button class="btn" type="button" id="svBack" ${SV.i===0?'disabled':''}>← Артқа</button><button class="btn solid" type="button" id="svNext">${SV.i===SURVEY.length-1?'Тексеру':'Келесі →'}</button></div></div>`;
+  box.querySelectorAll('.sv-opt').forEach(b=>b.onclick=()=>{const v=b.dataset.v;
+    if(q.type==='closed'){SV.a[q.id]=v;box.querySelectorAll('.sv-opt').forEach(x=>{const on=x===b;x.classList.toggle('on',on);x.setAttribute('aria-checked',on);});}
+    else{let arr=Array.isArray(SV.a[q.id])?SV.a[q.id].slice():[];
+      if(arr.includes(v))arr=arr.filter(x=>x!==v);else{arr.push(v);if(q.none){arr=v===q.none?[v]:arr.filter(x=>x!==q.none);}}
+      SV.a[q.id]=arr;box.querySelectorAll('.sv-opt').forEach(x=>{const on=arr.includes(x.dataset.v);x.classList.toggle('on',on);x.setAttribute('aria-checked',on);});}
+    document.getElementById('svErr').textContent='';});
+  const ta=document.getElementById('svText');if(ta){ta.oninput=()=>{SV.a[q.id]=ta.value;document.getElementById('svCnt').textContent=ta.value.length+' / 600';};ta.focus();}
+  document.getElementById('svBack').onclick=()=>{SV.i--;svDraw();};
+  document.getElementById('svNext').onclick=()=>{const v=SV.a[q.id];
+    const empty=q.type==='open'?!(v||'').trim():q.type==='multi'?!(v&&v.length):!v;
+    if(empty&&!q.optional){document.getElementById('svErr').textContent=q.type==='open'?'Жауабыңызды жазыңыз.':'Кемінде бір жауап таңдаңыз.';return;}
+    SV.i++;svDraw();document.getElementById('sv').scrollIntoView({block:'start'});};
+}
+function svAns(q){const v=SV.a[q.id];if(q.type==='multi')return (v||[]).join(', ');return (v||'').trim()||'—';}
+function svReview(){
+  const box=document.getElementById('sv');
+  box.innerHTML=`<div class="sv-progress"><span>Барлығы жауап берілді</span><div class="bar" style="max-width:none"><i style="width:100%"></i></div></div>
+  <div class="sv-card"><span class="sv-type review">Тексеру</span><h2>Жауаптарыңызды тексеріңіз</h2>
+  <ol class="sv-review">${SURVEY.map((q,i)=>`<li><button type="button" data-i="${i}"><small>${esc(q.t)}</small><span>${esc(svAns(q))}</span></button></li>`).join('')}</ol>
+  <p class="muted small">Жауапты өзгерту үшін оны басыңыз.</p><p class="login-err" id="svErr" role="alert"></p>
+  <div class="sv-nav"><button class="btn" type="button" id="svBack">← Артқа</button><button class="btn solid" type="button" id="svSend">Жіберу</button></div></div>`;
+  box.querySelectorAll('.sv-review button').forEach(b=>b.onclick=()=>{SV.i=+b.dataset.i;svDraw();});
+  document.getElementById('svBack').onclick=()=>{SV.i=SURVEY.length-1;svDraw();};
+  document.getElementById('svSend').onclick=svSend;
+}
+async function svSend(){
+  const err=document.getElementById('svErr'),btn=document.getElementById('svSend');
+  if(!SURVEY_CFG.formAction){err.textContent='Сауалнама әзірге жауап қабылдауға қосылмаған. Кейінірек қайталап көріңіз.';return;}
+  if(SV.sending)return;SV.sending=true;btn.disabled=true;btn.textContent='Жіберілуде…';
+  const fd=new URLSearchParams();
+  SURVEY.forEach(q=>{const name=SURVEY_CFG.entries[q.id];if(!name)return;const v=SV.a[q.id];
+    if(q.type==='multi')(v||[]).forEach(x=>fd.append(name,x));else if(v&&String(v).trim())fd.append(name,String(v).trim());});
+  try{await fetch(SURVEY_CFG.formAction,{method:'POST',mode:'no-cors',body:fd});
+    try{localStorage.setItem('alash-survey-done','1');}catch(e){}SVDONE=true;svThanks(false);}
+  catch(e){err.textContent='Жіберу мүмкін болмады. Интернетті тексеріп, қайталап көріңіз.';btn.disabled=false;btn.textContent='Жіберу';}
+  SV.sending=false;
+}
+function svThanks(returning){
+  const box=document.getElementById('sv');if(!box)return;
+  box.innerHTML=`<div class="sv-card sv-done"><div class="sv-check" aria-hidden="true">✓</div><h2>Рахмет! Жауабыңыз қабылданды</h2>
+  <p class="muted">${returning?'Сіз бұл құрылғыдан сауалнаманы толтырдыңыз.':'Сіздің пікіріңіз зерттеуге қосылды.'} Енді тапсырмаларды орындап, біліміңізді тексеріп көріңіз.</p>
+  <div class="sv-nav"><a class="btn solid" href="#game">Тапсырмаларға өту</a><button class="btn" type="button" id="svAgain">Басқа адам толтырсын</button></div></div>`;
+  document.getElementById('svAgain').onclick=()=>{SV.i=0;SV.a={};SVDONE=false;try{localStorage.removeItem('alash-survey-done');}catch(e){}svDraw();};
 }
 
 VIEWS.terms=()=>`${head('Терминдер','18 тарихи термин','Карточканы бас — анықтамасы ашылады. Іздеу арқылы керек терминді тап.')}
