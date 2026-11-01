@@ -80,6 +80,26 @@ header.hero .wrap{position:relative;width:100%;padding-block:110px 44px}
 .tile .n{font:13px var(--mono);color:var(--gold2)}
 .tile h3{font-size:1.25rem}
 .tile p{font-size:14px;color:var(--muted)}
+.vids{padding-block:36px 8px;display:grid;justify-items:center;text-align:center;gap:10px}
+.vids h2{font-size:clamp(1.5rem,3.4vw,2.1rem)}
+.player{position:relative;width:100%;max-width:640px;aspect-ratio:16/9;border-radius:14px;overflow:hidden;border:1px solid var(--gold2);background:#000;box-shadow:0 18px 50px rgba(0,0,0,.4);margin-top:8px}
+.player video{width:100%;height:100%;display:block;background:#000}
+.vstart{position:absolute;inset:0;border:0;background:linear-gradient(0deg,rgba(6,32,43,.75),rgba(6,32,43,.1) 55%);cursor:pointer;display:grid;place-items:center;align-content:center;gap:10px;color:var(--ink)}
+.vstart .pbtn{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;background:var(--gold);color:var(--bg);box-shadow:0 8px 30px rgba(0,0,0,.45);transition:transform .2s}
+.vstart:hover .pbtn{transform:scale(1.08)}
+.vstart-t{font:600 14px var(--body);background:rgba(6,32,43,.7);padding:5px 12px;border-radius:999px}
+.vlist{list-style:none;margin:6px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:100%;max-width:640px}
+.vlist button{all:unset;box-sizing:border-box;cursor:pointer;display:grid;gap:6px;width:100%;text-align:left;padding:6px;border-radius:10px;border:1px solid var(--line);background:var(--paper)}
+.vlist button:hover{border-color:var(--gold2)}
+.vlist button:focus-visible{outline:3px solid var(--gold2)}
+.vlist button.on{border-color:var(--gold);background:var(--paper2)}
+.vthumb{position:relative;display:block;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:#000}
+.vthumb img{width:100%;height:100%;object-fit:cover;display:block}
+.vthumb b{position:absolute;right:5px;bottom:5px;font:11px var(--mono);background:rgba(0,0,0,.7);color:#fff;padding:1px 5px;border-radius:4px}
+.vmeta{display:grid;gap:2px;font-size:13px;line-height:1.3}
+.vmeta small{font:11px var(--mono);color:var(--gold2);text-transform:uppercase;letter-spacing:.06em}
+.vnote{margin:0}
+@media (max-width:560px){.vlist{grid-template-columns:1fr}.vlist button{grid-template-columns:110px 1fr;align-items:center}.vstart .pbtn{width:60px;height:60px}}
 .home-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:center;padding-block:40px}
 @media (max-width:820px){.home-row{grid-template-columns:1fr}}
 .home-row h2{font-size:clamp(1.6rem,3.6vw,2.3rem)}

@@ -228,6 +228,16 @@ VIEWS.home=()=>`
  <div class="stats"><div><b>10</b><span>негізгі тезис</span></div><div><b>30</b><span>тарихи факт</span></div><div><b>10</b><span>тарихи тұлға</span></div><div><b>5</b><span>тапсырма</span></div></div>
 </div></header>
 <div class="band" aria-hidden="true"></div>
+<section class="wrap vids" aria-labelledby="vidTitle">
+ <p class="eyebrow">Бейнесабақтар · 3 видео</p>
+ <h2 id="vidTitle">Тақырыпты 3 минутта көр</h2>
+ <div class="player">
+  <video id="vplayer" playsinline preload="none" controls poster="${VIDEOS[0].poster}"></video>
+  <button class="vstart" id="vstart" type="button" aria-label="Бейнесабақты бастау"><span class="pbtn"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span><span class="vstart-t">Бастау · ${VIDEOS.length} видео қатарынан</span></button>
+ </div>
+ <ol class="vlist" id="vlist">${VIDEOS.map((v,i)=>`<li><button type="button" data-i="${i}" class="${i===0?'on':''}"><span class="vthumb"><img src="${v.poster}" alt="" width="160" height="90" loading="lazy"><b>${v.dur}</b></span><span class="vmeta"><small>${i+1}-бейне</small>${v.t}</span></button></li>`).join('')}</ol>
+ <p class="muted small vnote" id="vnote">Бір видео біткенде келесісі автоматты түрде басталады.</p>
+</section>
 <section class="wrap home-row">
  <div><p class="eyebrow">Тақырып туралы</p><h2>Петициядан Думаға, Думадан Алашқа</h2>
   <p>1905 жылғы революция қазақ қоғамына алғаш рет ашық саяси талап қоюға мүмкіндік берді. Қарқаралы петициясынан басталған жол Мемлекеттік Дума мінбері, «Қазақ» газеті арқылы 1917 жылғы Алаш автономиясына ұласты.</p>
@@ -236,6 +246,20 @@ VIEWS.home=()=>`
 </section>
 <section class="wrap section"><div class="tiles">${NAV.slice(1).map(([id,l],i)=>`<a class="tile" href="#${id}"><span class="n">${String(i+1).padStart(2,'0')}</span><h3>${l}</h3><p>${{map:'Облыстар, темір жолдар, жәрмеңкелер, оқиға орындары',chrono:'1867–1988 жылдардағы оқиғалар желісі',learn:'Тақырыптың 10 негізгі тезисі',people:'Алаш дәуірінің 10 қайраткері',events:'Себебі, барысы, нәтижесі',facts:'30 нақты тарихи факт',game:'5 түрлі интерактивті тапсырма',survey:'Пікір сауалнамасы: 10 сұрақ, 3 түрі',terms:'Тарихи терминдер карточкалары',result:'Жалпы баға мен қорытынды'}[id]}</p></a>`).join('')}</div></section>`;
 
+const VIDEOS=[
+ {t:'ХХ ғасыр басындағы Қазақстан: саяси-экономикалық және әлеуметтік жағдай',src:'assets/video/v1.mp4',poster:'assets/video/v1.jpg',dur:'1:08'},
+ {t:'Петициялар және I–II Мемлекеттік Дума',src:'assets/video/v2.mp4',poster:'assets/video/v2.jpg',dur:'1:07'},
+ {t:'Алаш қозғалысы және қазақ зиялылары',src:'assets/video/v3.mp4',poster:'assets/video/v3.jpg',dur:'1:08'}
+];
+INIT.home=()=>{
+  const v=document.getElementById('vplayer'),start=document.getElementById('vstart'),list=document.getElementById('vlist'),note=document.getElementById('vnote');
+  if(!v)return;let cur=0;
+  const mark=()=>{list.querySelectorAll('button').forEach(b=>b.classList.toggle('on',+b.dataset.i===cur));note.textContent=cur<VIDEOS.length-1?`Қазір: ${cur+1}-бейне · келесісі автоматты түрде басталады.`:`Қазір: соңғы бейне.`;};
+  const play=i=>{cur=i;v.src=VIDEOS[i].src;v.poster=VIDEOS[i].poster;start.hidden=true;mark();const p=v.play();if(p&&p.catch)p.catch(()=>{});};
+  start.onclick=()=>play(cur);
+  list.onclick=e=>{const b=e.target.closest('button');if(b)play(+b.dataset.i);};
+  v.addEventListener('ended',()=>{if(cur<VIDEOS.length-1)play(cur+1);else{note.textContent='Барлық бейне көрілді. Енді «Оқу» бөліміне өт.';}});
+};
 VIEWS.map=()=>`${head('Тарихи карта','Қазақ облыстары ХХ ғасыр басында','Карта ХХ ғасыр басындағы оқиғалардың қай жерде болғанын және қазақ жерінің қалай басқарылғанын көрнекі түрде көрсетеді.')}
 <section class="wrap section">
 <div class="map-intro">
