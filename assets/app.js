@@ -50,6 +50,7 @@ const FACTS=[
 ];
 const CAT={pol:'Саясат',eco:'Экономика',cult:'Мәдениет'};
 
+const PHOTOS={"bok": "assets/people/bok.jpg", "bai": "assets/people/bai.jpg", "dul": "assets/people/dul.jpg", "tyn": "assets/people/tyn.jpg", "kar": "assets/people/kar.jpg", "bir": "assets/people/bir.jpg", "zhd": "assets/people/zhd.jpg", "hd": "assets/people/hd.jpg", "sho": "assets/people/sho.jpg", "ser": "assets/people/ser.jpg"};
 const PEOPLE=[
  {id:'bok',n:'Әлихан Бөкейханов',ini:'ӘБ',d:'1866–1937',r:'Алаш қозғалысының көшбасшысы',s:'Алашорда үкіметінің төрағасы, I Думаға Семей облысынан сайланған.',
   bio:'Санкт-Петербургтегі Орман институтын бітірді. Щербина экспедициясына қатысып, қазақ шаруашылығын зерттеді. 1905 жылы Қарқаралы петициясын әзірлеуге қатысты. I Думаға сайланғанымен, тұтқындалуына байланысты оның жұмысына қатыса алмады. Выборг үндеуіне қол қойғаны үшін түрмеге қамалды. «Қазақ» газетінің негізін қалаушылардың бірі.',
@@ -281,9 +282,9 @@ ${THESES.map((t,i)=>`<details class="thesis ${S.read.includes(i)?'done':''}" dat
 INIT.learn=()=>{document.querySelectorAll('.thesis').forEach(d=>d.addEventListener('toggle',()=>{if(!d.open)return;const i=+d.dataset.i;if(!S.read.includes(i)){S.read.push(i);save();d.classList.add('done');document.getElementById('lp').textContent=S.read.length+' / 10';document.getElementById('lb').style.width=S.read.length*10+'%';if(S.read.length===10)toast('Барлық тезис оқылды!');}}));};
 
 VIEWS.people=()=>`${head('Тұлғалар','Алаш дәуірінің 10 қайраткері','Карточканы бас — өмірбаяны, Думаға қатысы мен тағдыры ашылады.')}
-<section class="wrap section"><div class="people">${PEOPLE.map(p=>`<button class="person" data-id="${p.id}"><span class="avatar">${p.ini}</span><h3>${p.n}</h3><span class="dates">${p.d}</span><p>${p.s}</p></button>`).join('')}</div></section>`;
+<section class="wrap section"><div class="people">${PEOPLE.map(p=>`<button class="person" data-id="${p.id}"><span class="portrait"><img src="${PHOTOS[p.id]}" alt="${p.n}" loading="lazy" width="360" height="450"></span><h3>${p.n}</h3><span class="dates">${p.d}</span><p>${p.s}</p></button>`).join('')}</div></section>`;
 INIT.people=()=>{document.querySelectorAll('.person').forEach(b=>b.addEventListener('click',()=>{const p=PEOPLE.find(x=>x.id===b.dataset.id);
-  openSheet(`<div class="sheet-head"><span class="avatar">${p.ini}</span><div><h2>${p.n}</h2><span class="dates" style="font:13px var(--mono);color:var(--gold2)">${p.d} · ${p.r}</span></div><button class="close" aria-label="Жабу">✕</button></div><dl><div><dt>Өмірі мен қызметі</dt><dd>${p.bio}</dd></div><div><dt>Думаға қатысы</dt><dd>${p.duma}</dd></div><div><dt>Тағдыры</dt><dd>${p.fate}</dd></div></dl>`);}));};
+  openSheet(`<div class="sheet-head"><img class="sheet-photo" src="${PHOTOS[p.id]}" alt="${p.n}" width="96" height="120"><div><h2>${p.n}</h2><span class="dates" style="font:13px var(--mono);color:var(--gold2)">${p.d} · ${p.r}</span></div><button class="close" aria-label="Жабу">✕</button></div><dl><div><dt>Өмірі мен қызметі</dt><dd>${p.bio}</dd></div><div><dt>Думаға қатысы</dt><dd>${p.duma}</dd></div><div><dt>Тағдыры</dt><dd>${p.fate}</dd></div></dl>`);}));};
 function openSheet(html){const s=document.getElementById('sheet');s.innerHTML=`<div class="sheet-bg"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`;s.hidden=false;
   const close=()=>{s.hidden=true;s.innerHTML='';};s.querySelector('.close').onclick=close;s.querySelector('.sheet-bg').onclick=e=>{if(e.target.classList.contains('sheet-bg'))close();};
   document.addEventListener('keydown',function k(e){if(e.key==='Escape'){close();document.removeEventListener('keydown',k);}});s.querySelector('.close').focus();}
