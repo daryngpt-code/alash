@@ -1,7 +1,7 @@
 /* ============ DATA ============ */
 const NAV=[
  ['home','Басты бет'],['map','Карта'],['videos','Видео'],['learn','Оқу'],['people','Тұлғалар'],
- ['events','Оқиғалар'],['facts','Деректер'],['game','Ойын'],['survey','Сауалнама'],['terms','Терминдер'],['result','Нәтиже']];
+ ['events','Оқиғалар'],['facts','Деректер'],['game','Ойын'],['arena','Жарыс'],['survey','Сауалнама'],['terms','Терминдер'],['result','Нәтиже']];
 
 const THESES=[
  {t:'Отарлық басқару қазақтарды саяси құқықтан айырды',b:['1867–1868 жылғы уақытша ережелер мен 1891 жылғы Дала ережесі қазақ жерін мемлекет меншігі деп жариялады. Билік генерал-губернаторлар мен әскери губернаторлардың қолына шоғырланды.','Болыс пен ауыл старшыны сайлауы патша әкімшілігінің бақылауымен өтті, жоғары басқаруға қазақтар жіберілмеді.'],k:'Отарлық басқару — дәуірдің барлық мәселесінің саяси негізі.'},
@@ -244,7 +244,7 @@ VIEWS.home=()=>`
   <p>Сайттағы бөлімдерді ретімен өтіп, соңында «Нәтиже» бетінде өз деңгейіңді көр.</p></div>
  <figure class="illus">${mapSVG({layers:false})}<figcaption>ХХ ғасыр басындағы қазақ облыстары (схема). Толығырақ — «Карта» бөлімінде.</figcaption></figure>
 </section>
-<section class="wrap section"><div class="tiles">${NAV.slice(1).map(([id,l],i)=>`<a class="tile" href="#${id}"><span class="n">${String(i+1).padStart(2,'0')}</span><h3>${l}</h3><p>${{map:'Облыстар, темір жолдар, жәрмеңкелер, оқиға орындары',videos:'Көше сауалнамасы және сұхбат',chrono:'1867–1988 жылдардағы оқиғалар желісі',learn:'Тақырыптың 10 негізгі тезисі',people:'Алаш дәуірінің 10 қайраткері',events:'Себебі, барысы, нәтижесі',facts:'30 нақты тарихи факт',game:'5 түрлі интерактивті тапсырма',survey:'Пікір сауалнамасы: 10 сұрақ, 3 түрі',terms:'Тарихи терминдер карточкалары',result:'Жалпы баға мен қорытынды'}[id]}</p></a>`).join('')}</div></section>`;
+<section class="wrap section"><div class="tiles">${NAV.slice(1).map(([id,l],i)=>`<a class="tile" href="#${id}"><span class="n">${String(i+1).padStart(2,'0')}</span><h3>${l}</h3><p>${{map:'Облыстар, темір жолдар, жәрмеңкелер, оқиға орындары',videos:'Көше сауалнамасы және сұхбат',chrono:'1867–1988 жылдардағы оқиғалар желісі',learn:'Тақырыптың 10 негізгі тезисі',people:'Алаш дәуірінің 10 қайраткері',events:'Себебі, барысы, нәтижесі',facts:'30 нақты тарихи факт',game:'5 түрлі интерактивті тапсырма',arena:'Бүкіл аудиторияға арналған тікелей ойын',survey:'Пікір сауалнамасы: 10 сұрақ, 3 түрі',terms:'Тарихи терминдер карточкалары',result:'Жалпы баға мен қорытынды'}[id]}</p></a>`).join('')}</div></section>`;
 
 const VIDEOS=[
  {t:'ХХ ғасыр басындағы Қазақстан: саяси-экономикалық және әлеуметтік жағдай',src:'assets/video/v1.mp4',poster:'assets/video/v1.jpg',dur:'1:08'},
@@ -562,6 +562,229 @@ function svThanks(returning){
   <div class="sv-nav"><a class="btn solid" href="#game">Тапсырмаларға өту</a><button class="btn" type="button" id="svAgain">Басқа адам толтырсын</button></div></div>`;
   document.getElementById('svAgain').onclick=()=>{SV.i=0;SV.a={};SVDONE=false;try{localStorage.removeItem('alash-survey-done');}catch(e){}svDraw();};
 }
+
+/* ============ ARENA: live class game ============ */
+const ARENA_ON=true;
+const SITE_URL='https://daryngpt-code.github.io/alash/';
+const AQ_TIME=20000;
+const AQ=[
+ {q:'Қарқаралы петициясы қай жылы жазылды?',o:['1891','1905','1907','1916'],a:1},
+ {q:'Қарқаралы петициясына шамамен қанша адам қол қойды?',o:['1 500','5 000','14 500','40 000'],a:2},
+ {q:'I Мемлекеттік Дума неше күн жұмыс істеді?',o:['72 күн','1 жыл','30 күн','150 күн'],a:0},
+ {q:'«Қазақ» газеті Орынборда шықты.',o:['Ақиқат','Жалған'],a:0},
+ {q:'Алашорда үкіметінің төрағасы кім болды?',o:['А. Байтұрсынов','М. Шоқай','Ә. Бөкейханов','Ж. Досмұхамедов'],a:2},
+ {q:'1907 жылғы 3 маусым заңы не істеді?',o:['Қазақтарды Думаға сайлау құқығынан айырды','Алаш автономиясын жариялады','Жер алуды тоқтатты','«Қазақ» газетін жапты'],a:0},
+ {q:'«Оян, қазақ!» кітабының авторы кім?',o:['М. Сералин','М. Дулатов','А. Байтұрсынов','М. Тынышбаев'],a:1},
+ {q:'II Думаға Жетісу облысынан кім сайланды?',o:['Б. Қаратаев','А. Бірімжанов','Т. Нұрекенов','М. Тынышбаев'],a:3},
+ {q:'«Айқап» журналы Семейде шықты.',o:['Ақиқат','Жалған'],a:1},
+ {q:'Столыпиннің аграрлық реформасы қай жылы басталды?',o:['1896','1906','1913','1917'],a:1},
+ {q:'Алаш партиясы қай съезде құрылды?',o:['II жалпықазақ съезі','Қоянды жиыны','I жалпықазақ съезі','Орал съезі'],a:2},
+ {q:'«Оқу құралы» әліппесін кім жазды?',o:['А. Байтұрсынов','Ә. Бөкейханов','М. Дулатов','Х. Досмұхамедов'],a:0}
+];
+const BROKERS=(()=>{const m=location.search.match(/[?&]broker=([^&]+)/);return m?[decodeURIComponent(m[1])]:['wss://broker.emqx.io:8084/mqtt','wss://broker.hivemq.com:8884/mqtt'];})();
+const TOP='alash-dauiri/v1/';
+const SHAPES=['▲','◆','●','■'];
+function loadLib(src){return new Promise((res,rej)=>{if(document.querySelector(`script[data-lib="${src}"]`)){res();return;}const s=document.createElement('script');s.src=src;s.dataset.lib=src;s.onload=res;s.onerror=()=>rej(new Error('load'));document.head.appendChild(s);});}
+const ss={get(k){try{return JSON.parse(sessionStorage.getItem(k)||'null');}catch(e){return null;}},set(k,v){try{v==null?sessionStorage.removeItem(k):sessionStorage.setItem(k,JSON.stringify(v));}catch(e){}}};
+
+const NET={clients:[],subs:new Set(),handlers:[],
+  async start(){
+    if(this.clients.length)return;
+    if(!window.mqtt)await loadLib('assets/lib/mqtt.min.js');
+    BROKERS.forEach(u=>{
+      const c=mqtt.connect(u,{clientId:'al_'+Math.random().toString(36).slice(2,10),reconnectPeriod:2500,connectTimeout:9000,clean:true,keepalive:30});
+      c.on('connect',()=>{this.subs.forEach(t=>c.subscribe(t,{qos:1}));this.mark();});
+      ['close','offline','error'].forEach(ev=>c.on(ev,()=>this.mark()));
+      c.on('message',(t,p)=>{let d=null;if(p&&p.length){try{d=JSON.parse(p.toString());}catch(e){return;}}this.handlers.forEach(h=>h(t,d));});
+      this.clients.push(c);
+    });
+  },
+  sub(t){this.subs.add(t);this.clients.forEach(c=>{if(c.connected)c.subscribe(t,{qos:1});});},
+  pub(t,d){const m=d==null?'':JSON.stringify(d);this.clients.forEach(c=>c.publish(t,m,{qos:1,retain:true}));},
+  on(h){this.handlers.push(h);},
+  ok(){return this.clients.some(c=>c.connected);},
+  mark(){const on=this.ok();document.querySelectorAll('.net').forEach(el=>{el.dataset.on=on;el.querySelector('span').textContent=on?'Байланыс бар':'Байланыс орнатылуда…';});}
+};
+NET.on((t,d)=>{if(!A.room||!t.startsWith(TOP+A.room+'/'))return;const k=t.slice((TOP+A.room+'/').length);
+  if(k==='state'){A.state=d;A.gotState=true;onArena('state');}
+  else if(k==='final'){A.final=d;onArena('final');}
+  else if(k.startsWith('p/')){const id=k.slice(2);if(!d){delete A.players[id];}else{const o=A.players[id];if(!o||(d.a||[]).length>(o.a||[]).length||d.t>=o.t||d.d)A.players[id]=d;}onArena('players');}
+});
+
+const A={role:null,room:null,state:null,gotState:false,players:{},final:null,me:null,qi:0,timer:null,qStart:0,locked:false};
+function rk(){return TOP+A.room+'/';}
+function plist(){return Object.entries(A.players).map(([id,p])=>Object.assign({id},p));}
+function netBadge(){return `<p class="net" data-on="${NET.ok()}"><i></i><span>${NET.ok()?'Байланыс бар':'Байланыс орнатылуда…'}</span></p>`;}
+function joinUrl(){return SITE_URL+'?room='+A.room+'#arena';}
+
+VIEWS.arena=()=>`<div class="wrap arena-head"><p class="eyebrow">Жарыс · бүкіл аудиторияға арналған ойын</p><h1>Алаш жарысы</h1></div><section class="wrap section"><div id="arena" class="arena"></div></section>`;
+INIT.arena=()=>{
+  if(!ARENA_ON){document.getElementById('arena').innerHTML=`<div class="ar-card"><h2>Жарыс сайттың өзінде ойналады</h2><p class="muted">Бұл көріністе тікелей байланыс жабық. Ойынды мына сайтта ашыңыз:</p><p><a class="btn solid" href="${SITE_URL}#arena" target="_blank" rel="noopener">${SITE_URL}</a></p></div>`;return;}
+  if(!A.role){const h=ss.get('arena-host'),p=ss.get('arena-player');
+    if(h){A.role='host';A.room=h.room;arenaConnect();}
+    else if(p){A.role='player';A.room=p.room;A.me=p.me;A.qi=(p.me.a||[]).length;arenaConnect();}}
+  drawArena();
+};
+async function arenaConnect(){
+  try{await NET.start();}catch(e){const el=document.getElementById('arena');if(el)el.insertAdjacentHTML('afterbegin','<p class="login-err">Ойын кітапханасы жүктелмеді. Интернетті тексеріңіз.</p>');return;}
+  A.players={};A.final=null;A.gotState=false;
+  ['state','final','p/+'].forEach(k=>NET.sub(rk()+k));
+}
+function onArena(what){
+  if(A.role==='host'){
+    if(what==='players'&&A.state&&A.state.ph==='play'&&!A.final){const ps=plist();if(ps.length&&ps.every(p=>p.d)){hostFinish(true);return;}}
+    if(location.hash==='#arena'){if(what==='players')drawHostPlayers();else drawArena();}
+  }else if(A.role==='player'){
+    if(what==='state'&&A.state&&(A.state.ph==='play'||A.state.ph==='end')&&A.me&&!A.me.d&&A.timer==null&&A.qi<AQ.length&&location.hash==='#arena'&&!document.getElementById('qcard')){drawArena();return;}
+    if(location.hash!=='#arena')return;
+    if(what==='final'||what==='state'){if(!document.getElementById('qcard'))drawArena();}
+    if(what==='players')updWait();
+  }
+}
+function drawArena(){
+  const el=document.getElementById('arena');if(!el)return;
+  if(!A.role){
+    const room=(location.search.match(/[?&]room=(\d{4})/)||[])[1]||'';
+    el.innerHTML=`<div class="ar-pick">
+     <div class="ar-card big"><span class="ar-num">1</span><h2>Мұғалім</h2><p class="muted">Ойынды ашып, экранды проекторға шығарыңыз. Оқушылар QR кодпен немесе 4 таңбалы кодпен қосылады.</p><button class="btn solid" id="arHost" type="button">Ойын ашу</button></div>
+     <div class="ar-card big"><span class="ar-num">2</span><h2>Оқушы</h2><p class="muted">Мұғалімнің экранындағы кодты және атыңды жаз.</p>
+      <form id="arJoin" class="ar-join" novalidate><div class="field"><label for="arCode">Ойын коды</label><input id="arCode" inputmode="numeric" pattern="[0-9]*" maxlength="4" autocomplete="off" placeholder="0000" value="${room}"></div>
+      <div class="field"><label for="arName">Атың</label><input id="arName" maxlength="24" autocomplete="nickname" placeholder="Мысалы: Айгерім" value="${esc((ss.get('arena-name')||''))}"></div>
+      <p class="login-err" id="arErr" role="alert"></p><button class="btn solid wide" type="submit">Қосылу</button></form></div>
+    </div>
+    <div class="ar-how"><h3>Ойын қалай өтеді</h3><ol><li>Мұғалім «Ойын ашу» батырмасын басады, экранда код пен QR шығады.</li><li>Оқушылар телефонмен қосылады, аттары экранда пайда болады.</li><li>Мұғалім «Бастау» батырмасын басады. Әр оқушы 12 сұраққа өз қарқынымен жауап береді, әр сұраққа 20 секунд. Жылдам әрі дұрыс жауапқа көбірек ұпай беріледі.</li><li>Барлығы аяқтағанда экранға жалпы статистика мен жеңімпаздар шығады.</li></ol><p class="muted small">Ойынның ұзақтығы — шамамен 5 минут.</p></div>`;
+    document.getElementById('arHost').onclick=hostCreate;
+    document.getElementById('arJoin').addEventListener('submit',e=>{e.preventDefault();const c=document.getElementById('arCode').value.trim(),n=document.getElementById('arName').value.trim(),err=document.getElementById('arErr');
+      if(!/^\d{4}$/.test(c)){err.textContent='Ойын коды — 4 цифр.';return;}if(n.length<2){err.textContent='Атыңды жаз.';return;}playerJoin(c,n);});
+    if(room)setTimeout(()=>{const n=document.getElementById('arName');if(n&&!n.value)n.focus();},50);
+    return;
+  }
+  if(A.role==='host')drawHost(el);else drawPlayer(el);
+}
+
+/* ---------- host ---------- */
+async function hostCreate(){
+  A.role='host';A.room=String(1000+Math.floor(Math.random()*9000));ss.set('arena-host',{room:A.room});ss.set('arena-player',null);
+  drawArena();await arenaConnect();NET.pub(rk()+'state',{ph:'lobby',t:Date.now()});
+}
+function drawHost(el){
+  const ph=A.state?A.state.ph:'lobby';
+  if(A.final||ph==='end'){drawHostFinal(el);return;}
+  if(ph==='play'){
+    el.innerHTML=`<div class="ar-top">${netBadge()}<span class="ar-code-sm">Код: <b>${A.room}</b></span><span class="ar-clock" id="arClock">0:00</span></div>
+    <div class="ar-card"><div class="ar-live-h"><h2>Ойын жүріп жатыр</h2><p class="ar-done" id="arDone"></p></div><div class="ar-rows" id="arRows"></div>
+    <div class="cta"><button class="btn" id="arForce" type="button">Нәтижені қазір көрсету</button></div><p class="muted small">Барлық оқушы аяқтаған кезде нәтиже өзі шығады.</p></div>`;
+    document.getElementById('arForce').onclick=()=>hostFinish(false);
+    drawHostPlayers();tickClock();return;
+  }
+  el.innerHTML=`<div class="ar-top">${netBadge()}<button class="btn" id="arQuit" type="button">Шығу</button></div>
+  <div class="ar-lobby">
+   <div class="ar-card ar-join-info"><p class="eyebrow">Қосылу</p><p class="ar-url">${SITE_URL.replace('https://','')}</p><p class="muted">сайтын ашып, «Жарыс» → «Оқушы» бөліміне кодты жаз</p><div class="ar-code">${A.room.split('').map(d=>`<span>${d}</span>`).join('')}</div><div class="ar-qr" id="arQr" aria-label="Қосылуға арналған QR код"></div><p class="muted small">немесе QR кодты телефонмен сканерле</p></div>
+   <div class="ar-card"><div class="ar-live-h"><h2>Қатысушылар</h2><span class="ar-count" id="arCount">0</span></div><div class="ar-chips" id="arChips"><p class="muted" id="arEmpty">Оқушылардың қосылуын күтудеміз…</p></div>
+    <button class="btn solid wide" id="arStart" type="button" disabled>Бастау</button><p class="muted small">Әр оқушы 12 сұраққа жауап береді. Ойын шамамен 5 минутқа созылады.</p></div>
+  </div>`;
+  document.getElementById('arStart').onclick=()=>{NET.pub(rk()+'state',{ph:'play',t0:Date.now(),t:Date.now()});};
+  document.getElementById('arQuit').onclick=hostReset;
+  drawQR();drawHostPlayers();
+}
+async function drawQR(){const box=document.getElementById('arQr');if(!box)return;try{if(!window.qrcode)await loadLib('assets/lib/qrcode.js');const q=qrcode(0,'M');q.addData(joinUrl());q.make();box.innerHTML=q.createSvgTag({cellSize:6,margin:2,scalable:true});}catch(e){box.textContent='';}}
+function drawHostPlayers(){
+  const ps=plist();
+  const chips=document.getElementById('arChips');
+  if(chips){const st=document.getElementById('arStart');if(st)st.disabled=!ps.length;document.getElementById('arCount').textContent=ps.length;
+    const have=new Set([...chips.querySelectorAll('.chip')].map(c=>c.dataset.id));
+    if(ps.length){const e=document.getElementById('arEmpty');if(e)e.remove();}
+    ps.forEach(p=>{if(!have.has(p.id)){const s=document.createElement('span');s.className='chip';s.dataset.id=p.id;s.textContent=p.n||'—';chips.appendChild(s);}});
+    chips.querySelectorAll('.chip').forEach(c=>{if(!A.players[c.dataset.id])c.remove();});}
+  const rows=document.getElementById('arRows');
+  if(rows){ps.sort((a,b)=>(b.a||[]).length-(a.a||[]).length||b.s-a.s);
+    rows.innerHTML=ps.map(p=>{const n=(p.a||[]).length;return `<div class="ar-row ${p.d?'fin':''}"><span class="nm">${esc(p.n||'—')}</span><span class="bar"><i style="width:${n/AQ.length*100}%"></i></span><span class="pr">${p.d?'✓':n+'/'+AQ.length}</span><b>${p.s||0}</b></div>`;}).join('')||'<p class="muted">Қатысушы жоқ</p>';
+    document.getElementById('arDone').textContent=`Аяқтады: ${ps.filter(p=>p.d).length} / ${ps.length}`;}
+}
+function tickClock(){clearInterval(tickClock.t);tickClock.t=setInterval(()=>{const c=document.getElementById('arClock');if(!c||!A.state||!A.state.t0){clearInterval(tickClock.t);return;}const s=Math.floor((Date.now()-A.state.t0)/1000);c.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');},500);}
+function hostFinish(auto){
+  if(A.final)return;const ps=plist().filter(p=>(p.a||[]).length);
+  const rank=ps.map(p=>({id:p.id,n:p.n,s:p.s||0,c:(p.a||[]).filter(x=>x.ok).length,k:(p.a||[]).length,ms:(p.a||[]).reduce((m,x)=>m+(x.ms||0),0)})).sort((a,b)=>b.s-a.s||a.ms-b.ms);
+  const qs=AQ.map((q,i)=>{const ans=ps.map(p=>(p.a||[]).find(x=>x.q===i)).filter(Boolean);return {r:ans.length?Math.round(ans.filter(x=>x.ok).length/ans.length*100):null,n:ans.length,ms:ans.length?Math.round(ans.reduce((m,x)=>m+x.ms,0)/ans.length):0};});
+  const total=rank.reduce((m,r)=>m+r.k,0),right=rank.reduce((m,r)=>m+r.c,0);
+  const fin={rank:rank.slice(0,60),qs,n:rank.length,avg:total?Math.round(right/total*100):0,avgS:rank.length?Math.round(rank.reduce((m,r)=>m+r.s,0)/rank.length):0,t:Date.now(),auto};
+  A.final=fin;NET.pub(rk()+'final',fin);NET.pub(rk()+'state',{ph:'end',t0:A.state&&A.state.t0,t:Date.now()});
+  if(location.hash==='#arena')drawArena();
+}
+function drawHostFinal(el){
+  const f=A.final;if(!f){el.innerHTML='<div class="ar-card"><p class="muted">Нәтиже есептелуде…</p></div>';return;}
+  const pod=[f.rank[1],f.rank[0],f.rank[2]];const qsI=f.qs.map((x,i)=>Object.assign({i},x)).filter(x=>x.r!=null);
+  const hard=qsI.slice().sort((a,b)=>a.r-b.r)[0],easy=qsI.slice().sort((a,b)=>b.r-a.r)[0];
+  el.innerHTML=`<div class="ar-top">${netBadge()}<span class="ar-code-sm">Код: <b>${A.room}</b></span><button class="btn" id="arNew" type="button">Жаңа ойын</button></div>
+  <div class="ar-final">
+   <p class="eyebrow">${f.auto?'Барлығы аяқтады':'Ойын аяқталды'}</p><h2 class="ar-title">Жалпы нәтиже</h2>
+   <div class="podium">${pod.map((r,i)=>r?`<div class="pd p${[2,1,3][i]}" style="--d:${[.5,1,.2][i]}s"><span class="pd-n">${esc(r.n)}</span><span class="pd-s">${r.s} ұпай · ${r.c}/${AQ.length}</span><div class="pd-b"><b>${[2,1,3][i]}</b></div></div>`:'<div class="pd empty"></div>').join('')}</div>
+   <div class="ar-stats"><div><b class="cnt" data-to="${f.n}">0</b><span>қатысушы</span></div><div><b><i class="cnt" data-to="${f.avg}">0</i>%</b><span>дұрыс жауаптың орташа үлесі</span></div><div><b class="cnt" data-to="${f.avgS}">0</b><span>орташа ұпай</span></div><div><b>${hard?hard.i+1+'-сұрақ':'—'}</b><span>ең қиын${hard?' · '+hard.r+'% дұрыс':''}</span></div></div>
+   <div class="ar-grid2">
+    <div class="ar-card"><h3>Сұрақтар бойынша дұрыс жауап</h3><div class="qbars">${f.qs.map((x,i)=>`<div class="qb ${hard&&hard.i===i?'hard':''} ${easy&&easy.i===i?'easy':''}"><span class="qn">${i+1}</span><span class="qt">${esc(AQ[i].q)}</span><span class="bar"><i style="--w:${x.r||0}%"></i></span><b>${x.r==null?'—':x.r+'%'}</b></div>`).join('')}</div></div>
+    <div class="ar-card"><h3>Рейтинг</h3><ol class="lb">${f.rank.map((r,i)=>`<li><span class="lb-p">${i+1}</span><span class="lb-n">${esc(r.n)}</span><span class="lb-c">${r.c}/${AQ.length}</span><b>${r.s}</b></li>`).join('')||'<li class="muted">Жауап жоқ</li>'}</ol></div>
+   </div>
+  </div>`;
+  document.getElementById('arNew').onclick=hostReset;
+  el.querySelectorAll('.cnt').forEach(c=>{const to=+c.dataset.to,t0=performance.now();const st=t=>{const k=Math.min(1,(t-t0)/1200);c.textContent=Math.round(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(st);};requestAnimationFrame(st);});
+  requestAnimationFrame(()=>requestAnimationFrame(()=>el.querySelectorAll('.qbars i').forEach(i=>i.style.width=i.style.getPropertyValue('--w'))));
+}
+function hostReset(){
+  if(A.room){plist().forEach(p=>NET.pub(rk()+'p/'+p.id,null));NET.pub(rk()+'final',null);NET.pub(rk()+'state',null);}
+  ss.set('arena-host',null);A.role=null;A.room=null;A.state=null;A.players={};A.final=null;drawArena();
+}
+
+/* ---------- player ---------- */
+async function playerJoin(code,name){
+  ss.set('arena-name',name);A.role='player';A.room=code;
+  const old=ss.get('arena-player');A.me=(old&&old.room===code)?old.me:{id:'p'+Math.random().toString(36).slice(2,10),n:name,a:[],s:0,d:false,t:Date.now()};A.me.n=name;A.qi=A.me.a.length;
+  savePlayer();drawArena();await arenaConnect();pushMe();
+  setTimeout(()=>{if(A.role==='player'&&!A.gotState){const w=document.getElementById('arWaitMsg');if(w)w.textContent='Бұл кодпен ойын табылмады. Кодты тексеріңіз немесе мұғалімнің ойынды ашқанын күтіңіз.';}},8000);
+}
+function savePlayer(){ss.set('arena-player',{room:A.room,me:A.me});}
+function pushMe(){A.me.t=Date.now();savePlayer();NET.pub(rk()+'p/'+A.me.id,A.me);}
+function drawPlayer(el){
+  const ph=A.state?A.state.ph:null;
+  if(A.me.d||(ph==='end'&&A.final)){drawPlayerEnd(el);return;}
+  if(ph==='play'||ph==='end'){drawQuestion(el);return;}
+  el.innerHTML=`<div class="ar-top">${netBadge()}<span class="ar-code-sm">Код: <b>${A.room}</b></span><button class="btn" id="arLeave" type="button">Шығу</button></div>
+  <div class="ar-card ar-wait"><div class="pulse" aria-hidden="true"></div><h2>${esc(A.me.n)}, сен ойындасың!</h2><p id="arWaitMsg" class="muted">Мұғалім ойынды бастағанша күт. Атың экранда шықты ма, тексер.</p><p class="ar-count-line" id="arWaitN"></p></div>`;
+  document.getElementById('arLeave').onclick=playerLeave;updWait();
+}
+function updWait(){const w=document.getElementById('arWaitN');const ps=plist();if(w)w.textContent=ps.length?`Ойында ${ps.length} адам`:'';const d=document.getElementById('arPeers');if(d)d.textContent=`Аяқтағандар: ${ps.filter(p=>p.d).length} / ${ps.length}`;}
+function playerLeave(){if(A.me&&A.room&&!A.me.a.length)NET.pub(rk()+'p/'+A.me.id,null);ss.set('arena-player',null);A.role=null;A.room=null;A.me=null;A.state=null;A.players={};A.final=null;drawArena();}
+function drawQuestion(el){
+  if(A.qi>=AQ.length){A.me.d=true;pushMe();drawPlayerEnd(el);return;}
+  const q=AQ[A.qi];A.locked=false;
+  el.innerHTML=`<div class="ar-top">${netBadge()}<span class="ar-code-sm">${A.qi+1} / ${AQ.length}</span><span class="ar-score">Ұпай: <b id="arScore">${A.me.s}</b></span></div>
+  <div class="ar-q" id="qcard"><div class="tbar"><i id="tbar"></i></div><div class="ar-q-h"><span class="tsec" id="tsec">20</span><h2>${esc(q.q)}</h2></div>
+  <div class="ans ${q.o.length===2?'two':''}">${q.o.map((o,i)=>`<button type="button" class="an a${i}" data-i="${i}"><span class="sh">${SHAPES[i]}</span><span>${esc(o)}</span></button>`).join('')}</div><div class="fb" id="fb" hidden></div></div>`;
+  el.querySelectorAll('.an').forEach(b=>b.onclick=()=>answer(+b.dataset.i));
+  A.qStart=performance.now();const bar=document.getElementById('tbar');
+  clearInterval(A.timer);A.timer=setInterval(()=>{const el2=performance.now()-A.qStart,left=Math.max(0,AQ_TIME-el2);const tb=document.getElementById('tbar'),ts=document.getElementById('tsec');if(!tb){clearInterval(A.timer);A.timer=null;return;}tb.style.width=(left/AQ_TIME*100)+'%';ts.textContent=Math.ceil(left/1000);if(left<=0)answer(-1);},100);
+}
+function answer(i){
+  if(A.locked)return;A.locked=true;clearInterval(A.timer);A.timer=null;
+  const q=AQ[A.qi],ms=Math.min(AQ_TIME,Math.round(performance.now()-A.qStart)),ok=i===q.a,pts=ok?Math.round(500+500*(1-ms/AQ_TIME)):0;
+  A.me.a.push({q:A.qi,ok,ms,p:pts});A.me.s+=pts;A.qi++;if(A.qi>=AQ.length)A.me.d=true;pushMe();
+  document.querySelectorAll('.an').forEach((b,j)=>{b.disabled=true;b.classList.add(j===q.a?'right':(j===i?'wrong':'off'));});
+  const fb=document.getElementById('fb');fb.hidden=false;fb.className='fb '+(ok?'ok':'no');
+  fb.innerHTML=ok?`<b>Дұрыс!</b><span>+${pts} ұпай</span>`:(i<0?`<b>Уақыт бітті</b><span>Дұрысы: ${esc(q.o[q.a])}</span>`:`<b>Қате</b><span>Дұрысы: ${esc(q.o[q.a])}</span>`);
+  const sc=document.getElementById('arScore');if(sc)sc.textContent=A.me.s;
+  setTimeout(()=>{if(location.hash==='#arena'&&A.role==='player'){const el=document.getElementById('arena');if(el)drawPlayer(el);}},1700);
+}
+function drawPlayerEnd(el){
+  const f=A.final;const c=A.me.a.filter(x=>x.ok).length;
+  if(!f){el.innerHTML=`<div class="ar-top">${netBadge()}<span class="ar-code-sm">Код: <b>${A.room}</b></span></div>
+   <div class="ar-card ar-wait"><div class="pulse" aria-hidden="true"></div><h2>Жарайсың, ${esc(A.me.n)}!</h2><p class="ar-big">${A.me.s} <small>ұпай</small></p><p>Дұрыс жауап: <b>${c} / ${AQ.length}</b></p><p class="muted" id="arPeers"></p><p class="muted small">Барлығы аяқтағанда жалпы нәтиже осы жерде және мұғалімнің экранында шығады.</p></div>`;updWait();return;}
+  const pos=f.rank.findIndex(r=>r.id===A.me.id);
+  el.innerHTML=`<div class="ar-top">${netBadge()}<span class="ar-code-sm">Код: <b>${A.room}</b></span><button class="btn" id="arLeave" type="button">Шығу</button></div>
+  <div class="ar-card ar-me"><p class="eyebrow">Сенің нәтижең</p><p class="ar-place">${pos>=0?`<b>${pos+1}</b><span>орын · ${f.n} қатысушы</span>`:'<span>Нәтиже қабылданды</span>'}</p>
+   <div class="ar-stats sm"><div><b>${A.me.s}</b><span>ұпай</span></div><div><b>${c}/${AQ.length}</b><span>дұрыс жауап</span></div><div><b>${f.avg}%</b><span>сыныптың орташа нәтижесі</span></div></div>
+   <h3>Үздік үштік</h3><ol class="lb">${f.rank.slice(0,3).map((r,i)=>`<li class="${r.id===A.me.id?'me':''}"><span class="lb-p">${i+1}</span><span class="lb-n">${esc(r.n)}</span><span class="lb-c">${r.c}/${AQ.length}</span><b>${r.s}</b></li>`).join('')}</ol></div>`;
+  document.getElementById('arLeave').onclick=playerLeave;
+}
+if(/[?&]room=\d{4}/.test(location.search)&&!location.hash)location.hash='arena';
 
 VIEWS.terms=()=>`${head('Терминдер','18 тарихи термин','Карточканы бас — анықтамасы ашылады. Іздеу арқылы керек терминді тап.')}
 <section class="wrap section"><div class="tools"><input class="search" id="ts" type="search" placeholder="Терминді ізде…" aria-label="Терминнен іздеу"><button class="btn" id="flipall">Барлығын аудару</button></div>
