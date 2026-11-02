@@ -1,6 +1,6 @@
 /* ============ DATA ============ */
 const NAV=[
- ['home','Басты бет'],['map','Карта'],['learn','Оқу'],['people','Тұлғалар'],
+ ['home','Басты бет'],['map','Карта'],['videos','Видео'],['learn','Оқу'],['people','Тұлғалар'],
  ['events','Оқиғалар'],['facts','Деректер'],['game','Ойын'],['survey','Сауалнама'],['terms','Терминдер'],['result','Нәтиже']];
 
 const THESES=[
@@ -244,7 +244,7 @@ VIEWS.home=()=>`
   <p>Сайттағы бөлімдерді ретімен өтіп, соңында «Нәтиже» бетінде өз деңгейіңді көр.</p></div>
  <figure class="illus">${mapSVG({layers:false})}<figcaption>ХХ ғасыр басындағы қазақ облыстары (схема). Толығырақ — «Карта» бөлімінде.</figcaption></figure>
 </section>
-<section class="wrap section"><div class="tiles">${NAV.slice(1).map(([id,l],i)=>`<a class="tile" href="#${id}"><span class="n">${String(i+1).padStart(2,'0')}</span><h3>${l}</h3><p>${{map:'Облыстар, темір жолдар, жәрмеңкелер, оқиға орындары',chrono:'1867–1988 жылдардағы оқиғалар желісі',learn:'Тақырыптың 10 негізгі тезисі',people:'Алаш дәуірінің 10 қайраткері',events:'Себебі, барысы, нәтижесі',facts:'30 нақты тарихи факт',game:'5 түрлі интерактивті тапсырма',survey:'Пікір сауалнамасы: 10 сұрақ, 3 түрі',terms:'Тарихи терминдер карточкалары',result:'Жалпы баға мен қорытынды'}[id]}</p></a>`).join('')}</div></section>`;
+<section class="wrap section"><div class="tiles">${NAV.slice(1).map(([id,l],i)=>`<a class="tile" href="#${id}"><span class="n">${String(i+1).padStart(2,'0')}</span><h3>${l}</h3><p>${{map:'Облыстар, темір жолдар, жәрмеңкелер, оқиға орындары',videos:'Көше сауалнамасы және сұхбат',chrono:'1867–1988 жылдардағы оқиғалар желісі',learn:'Тақырыптың 10 негізгі тезисі',people:'Алаш дәуірінің 10 қайраткері',events:'Себебі, барысы, нәтижесі',facts:'30 нақты тарихи факт',game:'5 түрлі интерактивті тапсырма',survey:'Пікір сауалнамасы: 10 сұрақ, 3 түрі',terms:'Тарихи терминдер карточкалары',result:'Жалпы баға мен қорытынды'}[id]}</p></a>`).join('')}</div></section>`;
 
 const VIDEOS=[
  {t:'ХХ ғасыр басындағы Қазақстан: саяси-экономикалық және әлеуметтік жағдай',src:'assets/video/v1.mp4',poster:'assets/video/v1.jpg',dur:'1:08'},
@@ -259,6 +259,17 @@ INIT.home=()=>{
   start.onclick=()=>play(cur);
   list.onclick=e=>{const b=e.target.closest('button');if(b)play(+b.dataset.i);};
   v.addEventListener('ended',()=>{if(cur<VIDEOS.length-1)play(cur+1);else{note.textContent='Барлық бейне көрілді. Енді «Оқу» бөліміне өт.';}});
+};
+const CLIPS=[
+ {t:'Көше сауалнамасы',d:'Қала тұрғындарымен көшеде жүргізілген сауалнама және түсірілім сәттері (backstage).',src:'assets/video/v4.mp4',poster:'assets/video/v4.jpg',dur:'2:09',tag:'Сауалнама'},
+ {t:'Сұхбат: ХХ ғасыр басындағы Қазақстан',d:'ХХ ғасыр басындағы Қазақстанның саяси, экономикалық және әлеуметтік жағдайы және оның қазақ зиялыларының саяси күреске араласуына әсері туралы сұхбат.',src:'assets/video/v5.mp4',poster:'assets/video/v5.jpg',dur:'2:57',tag:'Сұхбат'}
+];
+VIEWS.videos=()=>`${head('Видео','Біздің бейнелеріміз','Тақырып бойынша өзіміз түсірген екі видео. Көру үшін видеоны бас.')}
+<section class="wrap section"><div class="clips">${CLIPS.map((c,i)=>`<article class="clip"><div class="player"><video id="clip${i}" playsinline preload="none" controls poster="${c.poster}" src="${c.src}"></video><button class="vstart" type="button" data-i="${i}" aria-label="${c.t} — көру"><span class="pbtn"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span><span class="vstart-t">${c.dur}</span></button></div><div class="clip-txt"><span class="tag pol">${c.tag}</span><h2>${c.t}</h2><p class="muted">${c.d}</p></div></article>`).join('')}</div></section>`;
+INIT.videos=()=>{
+  const vs=CLIPS.map((_,i)=>document.getElementById('clip'+i));
+  document.querySelectorAll('.clips .vstart').forEach(b=>b.onclick=()=>{const v=vs[+b.dataset.i];b.hidden=true;const p=v.play();if(p&&p.catch)p.catch(()=>{});});
+  vs.forEach((v,i)=>v.addEventListener('play',()=>{vs.forEach((o,j)=>{if(j!==i&&!o.paused)o.pause();});const b=document.querySelector(`.clips .vstart[data-i="${i}"]`);if(b)b.hidden=true;}));
 };
 VIEWS.map=()=>`${head('Тарихи карта','Қазақ облыстары ХХ ғасыр басында','Карта ХХ ғасыр басындағы оқиғалардың қай жерде болғанын және қазақ жерінің қалай басқарылғанын көрнекі түрде көрсетеді.')}
 <section class="wrap section">

@@ -100,6 +100,13 @@ header.hero .wrap{position:relative;width:100%;padding-block:110px 44px}
 .vmeta small{font:11px var(--mono);color:var(--gold2);text-transform:uppercase;letter-spacing:.06em}
 .vnote{margin:0}
 @media (max-width:560px){.vlist{grid-template-columns:1fr}.vlist button{grid-template-columns:110px 1fr;align-items:center}.vstart .pbtn{width:60px;height:60px}}
+.clips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;align-items:start}
+@media (max-width:820px){.clips{grid-template-columns:1fr}}
+.clip{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:grid}
+.clip .player{max-width:none;margin:0;border:0;border-radius:0;box-shadow:none}
+.clip-txt{padding:16px 18px 20px;display:grid;gap:8px;justify-items:start}
+.clip-txt .tag{margin-left:0}
+.clip-txt h2{font-size:1.4rem}
 .home-row{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:24px;align-items:center;padding-block:40px}
 @media (max-width:820px){.home-row{grid-template-columns:1fr}}
 .home-row h2{font-size:clamp(1.6rem,3.6vw,2.3rem)}
