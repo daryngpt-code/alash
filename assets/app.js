@@ -261,12 +261,59 @@ INIT.home=()=>{
   v.addEventListener('ended',()=>{if(cur<VIDEOS.length-1)play(cur+1);else{note.textContent='Барлық бейне көрілді. Енді «Оқу» бөліміне өт.';}});
 };
 const CLIPS=[
- {t:'Көше сауалнамасы',d:'Қала тұрғындарымен көшеде жүргізілген сауалнама және түсірілім сәттері (backstage).',src:'assets/video/v4.mp4',poster:'assets/video/v4.jpg',dur:'2:09',tag:'Сауалнама'},
+ {t:'Көше сауалнамасы',d:'Қала тұрғындарымен көшеде жүргізілген сауалнама және түсірілім сәттері (backstage).',src:'assets/video/v4.mp4',poster:'assets/video/v4.jpg',dur:'2:09',tag:'Сауалнама',stats:true},
  {t:'Сұхбат: ХХ ғасыр басындағы Қазақстан',d:'ХХ ғасыр басындағы Қазақстанның саяси, экономикалық және әлеуметтік жағдайы және оның қазақ зиялыларының саяси күреске араласуына әсері туралы сұхбат.',src:'assets/video/v5.mp4',poster:'assets/video/v5.jpg',dur:'2:57',tag:'Сұхбат'}
 ];
+const STATS={total:21,rows:[
+ {k:'refuse',l:'Жауап беруден бас тартты',n:12,c:'#559cf7'},
+ {k:'right',l:'Дұрыс жауап берді',n:7,c:'#6fcb85'},
+ {k:'wrong',l:'Қате жауап берді',n:2,c:'#f0905a'}]};
+const pct=(n,t)=>(Math.round(n/t*1000)/10).toFixed(1).replace('.',',');
+function statsHTML(){
+  const T=STATS.total,R=70,C=2*Math.PI*R,G=1.6;let acc=0;
+  const segs=STATS.rows.map((r,i)=>{const len=r.n/T*C;const start=acc/C*360-90;acc+=len;
+    return `<circle class="seg" data-i="${i}" cx="100" cy="100" r="${R}" fill="none" stroke="${r.c}" stroke-width="34" stroke-dasharray="0 ${C}" data-len="${Math.max(0,len-G)}" data-c="${C}" transform="rotate(${start} 100 100)" style="transition-delay:${i*.28}s"><title>${r.l}: ${pct(r.n,T)}%</title></circle>`;}).join('');
+  const ans=STATS.rows.filter(r=>r.k!=='refuse'),A=ans.reduce((a,r)=>a+r.n,0);
+  return `<div class="stat-wrap" id="statPanel" role="region" aria-label="Көше сауалнамасының нәтижесі"><div class="stat-in"><div class="stat">
+  <p class="eyebrow">Сауалнама нәтижесі</p>
+  <h3>Сұрақ қойылған <b class="num" data-to="${T}">0</b> адамның <b class="num" data-to="${A}">0</b>-ы жауап берді <span class="hl">(${pct(A,T)}%)</span>, ал <b class="num" data-to="${STATS.rows[0].n}">0</b>-сі жауап беруден бас тартты <span class="hl b">(${pct(STATS.rows[0].n,T)}%)</span>.</h3>
+  <div class="donut-row">
+   <div class="donut" id="donut"><svg viewBox="0 0 200 200" role="img" aria-label="21 адамның жауабы: ${STATS.rows.map(r=>r.l+' '+pct(r.n,T)+'%').join(', ')}">${segs}</svg>
+    <div class="donut-c" id="donutC"><b>${T}</b><span>адам</span></div>
+    <div class="dtip" id="dtip" hidden></div></div>
+   <ul class="legend">${STATS.rows.map((r,i)=>`<li data-i="${i}" tabindex="0"><i style="background:${r.c}"></i><span>${r.l}</span><b>${r.n}</b><small>${pct(r.n,T)}%</small></li>`).join('')}</ul>
+  </div>
+  <p class="muted small">Әр бөлік сұрақ қойылған барлық адам ішіндегі үлесті көрсетеді. Шеңбердің үстіне апарыңыз немесе басыңыз.</p>
+  <div class="stat-table"><div class="st-h"><span>Жауап нәтижесі</span><span>Адам саны</span><span>Жауап берген ${A} адамның ішіндегі үлесі</span></div>
+   ${ans.map(r=>`<div class="st-r"><span><i style="background:${r.c}"></i>${r.l.replace(' берді','')}</span><b>${r.n}</b><span class="st-bar"><em style="--w:${r.n/A*100}%;background:${r.c}"></em><strong>${pct(r.n,A)}%</strong></span></div>`).join('')}</div>
+  <p class="stat-concl"><b>Әр үш адамның біреуі дұрыс жауап берді</b> (${T} адамның ${ans[0].n}-еуі). Ал тек жауап бергендерді қарасақ, дұрыс жауап үлесі төрттен үштен асты.</p>
+  </div></div></div>`;
+}
+function initStats(){
+  const btn=document.getElementById('statBtn'),wrap=document.getElementById('statPanel');if(!btn)return;
+  const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const segs=[...wrap.querySelectorAll('.seg')],tip=document.getElementById('dtip'),cen=document.getElementById('donutC'),donut=document.getElementById('donut');
+  let played=false;
+  const play=()=>{segs.forEach(c=>{c.style.strokeDasharray=`0 ${c.dataset.c}`;});void wrap.offsetWidth;
+    requestAnimationFrame(()=>segs.forEach(c=>{c.style.strokeDasharray=`${c.dataset.len} ${c.dataset.c}`;}));
+    wrap.querySelectorAll('.num').forEach(el=>{const to=+el.dataset.to;if(reduce){el.textContent=to;return;}const t0=performance.now();const step=t=>{const k=Math.min(1,(t-t0)/900);el.textContent=Math.round(to*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(step);};requestAnimationFrame(step);});
+    wrap.querySelectorAll('.st-bar em').forEach(e=>{e.style.width='0';requestAnimationFrame(()=>requestAnimationFrame(()=>{e.style.width=e.style.getPropertyValue('--w');}));});};
+  btn.onclick=()=>{const open=!wrap.classList.contains('open');wrap.classList.toggle('open',open);btn.setAttribute('aria-expanded',open);
+    if(open){play();setTimeout(()=>wrap.scrollIntoView({behavior:reduce?'auto':'smooth',block:'nearest'}),250);}};
+  const show=(i,x,y)=>{const r=STATS.rows[i];segs.forEach((c,j)=>c.classList.toggle('dim',j!==i));segs[i].classList.add('act');
+    wrap.querySelectorAll('.legend li').forEach((l,j)=>l.classList.toggle('on',j===i));
+    cen.innerHTML=`<b style="color:${r.c}">${pct(r.n,STATS.total)}%</b><span>${r.n} адам</span>`;
+    tip.innerHTML=`<strong>${r.l}</strong><span><i style="background:${r.c}"></i>адам саны<b>${pct(r.n,STATS.total)}%</b></span>`;tip.hidden=false;
+    const b=donut.getBoundingClientRect();const tx=x==null?b.width/2:x-b.left,ty=y==null?b.height*0.12:y-b.top;
+    tip.style.left=Math.min(Math.max(tx,90),b.width-90)+'px';tip.style.top=Math.max(ty-14,0)+'px';};
+  const hide=()=>{segs.forEach(c=>c.classList.remove('dim','act'));wrap.querySelectorAll('.legend li').forEach(l=>l.classList.remove('on'));cen.innerHTML=`<b>${STATS.total}</b><span>адам</span>`;tip.hidden=true;};
+  segs.forEach(c=>{c.addEventListener('pointermove',e=>{segs.forEach(o=>o.classList.remove('act'));show(+c.dataset.i,e.clientX,e.clientY);});c.addEventListener('pointerleave',hide);c.addEventListener('click',e=>show(+c.dataset.i,e.clientX,e.clientY));});
+  wrap.querySelectorAll('.legend li').forEach(l=>{const i=+l.dataset.i;l.addEventListener('mouseenter',()=>show(i));l.addEventListener('mouseleave',hide);l.addEventListener('focus',()=>show(i));l.addEventListener('blur',hide);l.addEventListener('click',()=>show(i));});
+}
 VIEWS.videos=()=>`${head('Видео','Біздің бейнелеріміз','Тақырып бойынша өзіміз түсірген екі видео. Көру үшін видеоны бас.')}
-<section class="wrap section"><div class="clips">${CLIPS.map((c,i)=>`<article class="clip"><div class="player"><video id="clip${i}" playsinline preload="none" controls poster="${c.poster}" src="${c.src}"></video><button class="vstart" type="button" data-i="${i}" aria-label="${c.t} — көру"><span class="pbtn"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span><span class="vstart-t">${c.dur}</span></button></div><div class="clip-txt"><span class="tag pol">${c.tag}</span><h2>${c.t}</h2><p class="muted">${c.d}</p></div></article>`).join('')}</div></section>`;
+<section class="wrap section"><div class="clips">${CLIPS.map((c,i)=>`<article class="clip"><div class="player"><video id="clip${i}" playsinline preload="none" controls poster="${c.poster}" src="${c.src}"></video><button class="vstart" type="button" data-i="${i}" aria-label="${c.t} — көру"><span class="pbtn"><svg viewBox="0 0 24 24" width="30" height="30"><path d="M8 5v14l11-7z" fill="currentColor"/></svg></span><span class="vstart-t">${c.dur}</span></button></div><div class="clip-txt"><span class="tag pol">${c.tag}</span><h2>${c.t}</h2><p class="muted">${c.d}</p>${c.stats?`<button class="btn solid stat-btn" type="button" id="statBtn" aria-expanded="false" aria-controls="statPanel"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9h-9z" fill="currentColor"/><path d="M14 2.2V10h7.8A9 9 0 0 0 14 2.2z" fill="currentColor" opacity=".55"/></svg><span>Сауалнама нәтижесі</span><i class="chev" aria-hidden="true">▾</i></button>`:''}</div>${c.stats?statsHTML():''}</article>`).join('')}</div></section>`;
 INIT.videos=()=>{
+  initStats();
   const vs=CLIPS.map((_,i)=>document.getElementById('clip'+i));
   document.querySelectorAll('.clips .vstart').forEach(b=>b.onclick=()=>{const v=vs[+b.dataset.i];b.hidden=true;const p=v.play();if(p&&p.catch)p.catch(()=>{});});
   vs.forEach((v,i)=>v.addEventListener('play',()=>{vs.forEach((o,j)=>{if(j!==i&&!o.paused)o.pause();});const b=document.querySelector(`.clips .vstart[data-i="${i}"]`);if(b)b.hidden=true;}));
